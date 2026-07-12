@@ -5,7 +5,7 @@ import authRoutes from './auth.routes.js';
 import tripRoutes from './trip.routes.js';
 import maintenanceRoutes from './maintenance.routes.js';
 import expenseRoutes from './expense.routes.js';
-// dashboard will be added when implemented
+import dashboardRoutes from './dashboard.routes.js';
 
 const router = Router();
 
@@ -15,5 +15,8 @@ router.use('/auth', authRoutes);
 router.use('/trips', tripRoutes);
 router.use('/maintenance', maintenanceRoutes);
 router.use('/expenses', expenseRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;
+
+
