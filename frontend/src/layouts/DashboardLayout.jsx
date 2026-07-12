@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
+import ErrorBoundary from '../components/common/ErrorBoundary';
 import { motion } from 'framer-motion';
 
 export default function DashboardLayout() {
@@ -16,10 +17,13 @@ export default function DashboardLayout() {
             transition={{ duration: 0.3 }}
             className="max-w-[1400px] mx-auto"
           >
-            <Outlet />
+            <ErrorBoundary>
+              <Outlet />
+            </ErrorBoundary>
           </motion.div>
         </main>
       </div>
     </div>
   );
 }
+

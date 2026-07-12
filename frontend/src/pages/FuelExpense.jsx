@@ -138,8 +138,8 @@ export default function FuelExpense() {
                 <td className="py-3 pr-4 text-text-secondary">
                   {exp.maintenance > 0 ? `₹${exp.maintenance.toLocaleString()}` : '0'}
                 </td>
-                <td className="py-3">
-                  <StatusBadge status={exp.status} />
+                <td className="py-3 font-semibold text-white">
+                  ₹{exp.total?.toLocaleString() ?? '0'}
                 </td>
               </motion.tr>
             ))}

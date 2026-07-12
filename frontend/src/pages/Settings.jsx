@@ -56,7 +56,7 @@ export default function Settings() {
             className={`flex items-center gap-2 px-5 py-2.5 rounded-btn font-semibold text-sm transition-all duration-300 ${
               saved
                 ? 'bg-success/20 text-success border border-success/30'
-                : 'bg-blue/20 text-blue border border-blue/30 hover:bg-blue/30'
+                : 'btn-primary'
             }`}
           >
             {saved ? (

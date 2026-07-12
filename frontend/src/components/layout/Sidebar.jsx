@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -10,6 +10,7 @@ import {
   BarChart3,
   Settings,
   Zap,
+  LogOut,
 } from 'lucide-react';
 
 const navItems = [
@@ -24,6 +25,8 @@ const navItems = [
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
   return (
     <motion.aside
       initial={{ x: -20, opacity: 0 }}
@@ -66,6 +69,17 @@ export default function Sidebar() {
             )}
           </NavLink>
         ))}
+
+        {/* Logout */}
+        <motion.button
+          whileHover={{ x: 2 }}
+          transition={{ duration: 0.15 }}
+          onClick={() => navigate('/login')}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-danger/80 hover:text-danger hover:bg-danger/10 transition-all duration-200 cursor-pointer text-sm font-medium mt-2"
+        >
+          <LogOut size={17} />
+          <span>Logout</span>
+        </motion.button>
       </nav>
 
       {/* Footer */}
@@ -77,3 +91,4 @@ export default function Sidebar() {
     </motion.aside>
   );
 }
+

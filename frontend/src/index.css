@@ -70,7 +70,7 @@
   }
 
   .table-row-hover {
-    @apply hover:bg-white/[0.03] transition-colors duration-150 cursor-pointer;
+    @apply hover:bg-white/[0.06] transition-colors duration-150 cursor-pointer;
   }
 
   .sidebar-item {
