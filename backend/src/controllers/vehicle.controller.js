@@ -25,3 +25,18 @@ export const getDispatchableVehicles = asyncHandler(async (req, res) => {
   const vehicles = await VehicleService.getDispatchableVehicles();
   res.status(200).json(new ApiResponse(200, vehicles, 'Dispatchable vehicles retrieved successfully'));
 });
+
+// @desc    Update vehicle status
+// @route   PATCH /api/vehicles/:id/status
+// @access  Private
+export const updateVehicleStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  
+  if (!status) {
+    return res.status(400).json(new ApiResponse(400, null, 'Status field is required'));
+  }
+  
+  const vehicle = await VehicleService.updateVehicleStatus(id, status.toUpperCase());
+  res.status(200).json(new ApiResponse(200, vehicle, `Vehicle status updated to ${vehicle.status}`));
+});

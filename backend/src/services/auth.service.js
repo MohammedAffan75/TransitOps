@@ -82,11 +82,41 @@ export async function loginUser(email, password) {
   return {
     accessToken,
     refreshToken,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    }
+    user: { id: user.id, name: user.name, email: user.email, role: user.role }
   };
-}
+};
+
+export const logout = async (userId) => {
+  if (!userId) throw new ApiError(400, 'User ID is required for logout.');
+
+  await prisma.user.update({
+    where: { id: Number(userId) },
+    data: {
+      accessToken: null,
+      refreshToken: null
+    }
+  });
+
+  return { success: true };
+};
+
+export const getMe = async (userId) => {
+  if (!userId) throw new ApiError(400, 'User ID is required.');
+
+  const user = await prisma.user.findUnique({
+    where: { id: Number(userId) },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true
+    }
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'User not found.');
+  }
+
+  return user;
+};

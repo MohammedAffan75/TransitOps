@@ -87,3 +87,28 @@ const mapDriver = (d) => {
     tripCompletion: completion
   };
 };
+
+export const updateDriverStatus = async (driverId, newStatus) => {
+  const id = Number(driverId);
+  const validStatuses = ['AVAILABLE', 'ON_TRIP', 'OFF_DUTY', 'SUSPENDED'];
+
+  if (!validStatuses.includes(newStatus)) {
+    throw new ApiError(400, `Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+  }
+
+  const driver = await prisma.driver.findUnique({ where: { id } });
+  if (!driver) {
+    throw new ApiError(404, `Driver with ID ${id} not found.`);
+  }
+
+  if (driver.status === 'ON_TRIP' && newStatus !== 'ON_TRIP') {
+    throw new ApiError(400, 'Cannot change status of a driver that is currently ON_TRIP. Complete or cancel the trip first.');
+  }
+
+  const updatedDriver = await prisma.driver.update({
+    where: { id },
+    data: { status: newStatus }
+  });
+
+  return mapDriver(updatedDriver);
+};

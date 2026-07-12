@@ -72,3 +72,28 @@ const mapVehicle = (vehicle) => {
     year: new Date().getFullYear(),
   };
 };
+
+export const updateVehicleStatus = async (vehicleId, newStatus) => {
+  const id = Number(vehicleId);
+  const validStatuses = ['AVAILABLE', 'ON_TRIP', 'IN_SHOP', 'RETIRED'];
+
+  if (!validStatuses.includes(newStatus)) {
+    throw new ApiError(400, `Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+  }
+
+  const vehicle = await prisma.vehicle.findUnique({ where: { id } });
+  if (!vehicle) {
+    throw new ApiError(404, `Vehicle with ID ${id} not found.`);
+  }
+
+  if (vehicle.status === 'ON_TRIP' && newStatus !== 'ON_TRIP') {
+    throw new ApiError(400, 'Cannot change status of a vehicle that is currently ON_TRIP. Complete or cancel the trip first.');
+  }
+
+  const updatedVehicle = await prisma.vehicle.update({
+    where: { id },
+    data: { status: newStatus }
+  });
+
+  return mapVehicle(updatedVehicle);
+};

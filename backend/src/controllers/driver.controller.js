@@ -25,3 +25,18 @@ export const getDispatchableDrivers = asyncHandler(async (req, res) => {
   const drivers = await DriverService.getDispatchableDrivers();
   res.status(200).json(new ApiResponse(200, drivers, 'Dispatchable drivers retrieved successfully'));
 });
+
+// @desc    Update driver status
+// @route   PATCH /api/drivers/:id/status
+// @access  Private
+export const updateDriverStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  
+  if (!status) {
+    return res.status(400).json(new ApiResponse(400, null, 'Status field is required'));
+  }
+  
+  const driver = await DriverService.updateDriverStatus(id, status.toUpperCase());
+  res.status(200).json(new ApiResponse(200, driver, `Driver status updated to ${driver.status}`));
+});
