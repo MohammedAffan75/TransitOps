@@ -35,7 +35,7 @@ export function generateAccessToken(user) {
     email: user.email,
     role: user.role
   };
-  return jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: '15m' });
+  return jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: '8h' });
 }
 
 /**

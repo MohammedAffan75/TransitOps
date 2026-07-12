@@ -62,7 +62,48 @@ export async function getDashboardKPIs() {
   // Vehicle ROI ((Revenue - Operational Cost) / Acquisition Cost)
   const vehicleROI = totalAcquisitionCost > 0 ? (((totalRevenue - operationalCost) / totalAcquisitionCost) * 100).toFixed(2) : 0;
 
+  // Extra fields the frontend expects
+  const completedTrips   = await prisma.trip.count({ where: { status: 'COMPLETED' } });
+  const availableDrivers = await prisma.driver.count({ where: { status: 'AVAILABLE' } });
+  const expensesAgg = await prisma.expense.aggregate({ _sum: { amount: true } });
+  const otherExpenses = Number(expensesAgg._sum.amount || 0);
+  const totalExpenses = operationalCost + otherExpenses;
+
+  // 5. Generate Monthly Revenue for charts (Mocking trailing 6 months dynamically based on real total, or just static structure if no real timeline data)
+  // For simplicity, we'll create a 6 month array and put all total revenue in current month if we don't have historical trips.
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const currentMonth = new Date().getMonth();
+  const monthlyRevenue = [];
+  for (let i = 5; i >= 0; i--) {
+    let m = currentMonth - i;
+    if (m < 0) m += 12;
+    monthlyRevenue.push({ month: months[m], revenue: i === 0 ? totalRevenue : 0 });
+  }
+
+  // 6. Costliest Vehicles
+  // Fetch vehicles ordered by acquisitionCost as a proxy, or calculate real maintenance/fuel.
+  const topVehicles = await prisma.vehicle.findMany({
+    orderBy: { acquisitionCost: 'desc' },
+    take: 3,
+    select: { model: true, registrationNumber: true, acquisitionCost: true }
+  });
+  const maxCost = topVehicles.length > 0 ? Number(topVehicles[0].acquisitionCost) : 10000;
+  const costliestVehicles = topVehicles.map(v => ({
+    name: `${v.model} (${v.registrationNumber})`,
+    cost: Number(v.acquisitionCost),
+    max: maxCost
+  }));
+
   return {
+    // Aliased for frontend compatibility
+    totalActiveVehicles: activeVehicles,
+    ongoingTrips: activeTrips,
+    vehiclesInMaintenance: vehiclesInShop,
+    completedTrips,
+    availableDrivers,
+    totalExpenses,
+
+    // Original fields
     activeVehicles,
     availableVehicles,
     vehiclesInShop,
@@ -73,30 +114,37 @@ export async function getDashboardKPIs() {
     totalRevenue,
     operationalCost,
     fuelEfficiency: Number(fuelEfficiency),
-    vehicleROI: Number(vehicleROI)
+    vehicleROI: Number(vehicleROI),
+    
+    // New Chart Data
+    monthlyRevenue,
+    costliestVehicles
   };
 }
 
 /**
- * Generates a CSV string containing the dashboard KPIs.
+ * Generates a comprehensive CSV string containing metrics for all roles.
  * @returns {Promise<string>} CSV formatted string
  */
 export async function exportKPIsToCSV() {
   const kpis = await getDashboardKPIs();
   
-  const header = 'Metric,Value\n';
+  const header = 'Category,Metric,Value\n';
   const rows = [
-    `Total Active Vehicles,${kpis.activeVehicles}`,
-    `Available Vehicles,${kpis.availableVehicles}`,
-    `Vehicles In Shop,${kpis.vehiclesInShop}`,
-    `Active Trips,${kpis.activeTrips}`,
-    `Pending Trips,${kpis.pendingTrips}`,
-    `Drivers On Duty,${kpis.driversOnDuty}`,
-    `Fleet Utilization (%),${kpis.fleetUtilization}`,
-    `Total Revenue ($),${kpis.totalRevenue}`,
-    `Operational Cost ($),${kpis.operationalCost}`,
-    `Fuel Efficiency (km/L),${kpis.fuelEfficiency}`,
-    `Vehicle ROI (%),${kpis.vehicleROI}`
+    `Fleet,Total Active Vehicles,${kpis.totalActiveVehicles}`,
+    `Fleet,Available Vehicles,${kpis.availableVehicles}`,
+    `Fleet,Vehicles In Shop,${kpis.vehiclesInShop}`,
+    `Fleet,Fleet Utilization (%),${kpis.fleetUtilization}`,
+    `Driver,Drivers On Duty,${kpis.driversOnDuty}`,
+    `Driver,Available Drivers,${kpis.availableDrivers}`,
+    `Trip,Pending Trips,${kpis.pendingTrips}`,
+    `Trip,Active Trips,${kpis.activeTrips}`,
+    `Trip,Completed Trips,${kpis.completedTrips}`,
+    `Finance,Total Revenue (₹),${kpis.totalRevenue}`,
+    `Finance,Operational Cost (₹),${kpis.operationalCost}`,
+    `Finance,Total Expenses (₹),${kpis.totalExpenses}`,
+    `Finance,Fuel Efficiency (km/L),${kpis.fuelEfficiency}`,
+    `Finance,Vehicle ROI (%),${kpis.vehicleROI}`
   ].join('\n');
 
   return header + rows;

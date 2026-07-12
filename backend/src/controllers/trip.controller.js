@@ -1,10 +1,41 @@
 import asyncHandler from '../utils/asyncHandler.js';
 import ApiResponse from '../utils/ApiResponse.js';
+import ApiError from '../utils/ApiError.js';
 import * as tripService from '../services/trip.service.js';
+import prisma from '../config/prisma.js';
+
+/**
+ * GET /api/trips
+ * List all trips with vehicle and driver info
+ */
+export const getTrips = asyncHandler(async (req, res) => {
+  const trips = await prisma.trip.findMany({
+    include: {
+      vehicle: { select: { id: true, model: true, registrationNumber: true } },
+      driver:  { select: { id: true, name: true } },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  res.status(200).json(new ApiResponse(200, trips, 'Trips fetched successfully.'));
+});
+
+/**
+ * GET /api/trips/:id
+ */
+export const getTripById = asyncHandler(async (req, res) => {
+  const trip = await prisma.trip.findUnique({
+    where: { id: Number(req.params.id) },
+    include: {
+      vehicle: { select: { id: true, model: true, registrationNumber: true } },
+      driver:  { select: { id: true, name: true } },
+    },
+  });
+  if (!trip) throw new ApiError(404, 'Trip not found.');
+  res.status(200).json(new ApiResponse(200, trip, 'Trip fetched successfully.'));
+});
 
 /**
  * Handle POST /api/trips
- * Creates a DRAFT trip.
  */
 export const createDraftTrip = asyncHandler(async (req, res) => {
   const trip = await tripService.createDraftTrip(req.body);
@@ -13,7 +44,6 @@ export const createDraftTrip = asyncHandler(async (req, res) => {
 
 /**
  * Handle POST /api/trips/:id/dispatch
- * Atomically validates requirements and dispatches a trip.
  */
 export const dispatchTrip = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -23,7 +53,6 @@ export const dispatchTrip = asyncHandler(async (req, res) => {
 
 /**
  * Handle POST /api/trips/:id/complete
- * Atomically completes a trip and releases resources.
  */
 export const completeTrip = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -33,7 +62,6 @@ export const completeTrip = asyncHandler(async (req, res) => {
 
 /**
  * Handle POST /api/trips/:id/cancel
- * Atomically cancels a trip and releases resources.
  */
 export const cancelTrip = asyncHandler(async (req, res) => {
   const { id } = req.params;

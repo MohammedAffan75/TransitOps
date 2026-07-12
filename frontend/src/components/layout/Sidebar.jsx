@@ -16,6 +16,14 @@ const navItems = [
   { path: '/settings',     label: 'Settings',        icon: Settings },
 ];
 
+// RBAC Page Permissions Mapping
+const rolePermissions = {
+  FLEET_MANAGER: ['/dashboard', '/fleet', '/drivers', '/maintenance', '/analytics', '/settings'],
+  DISPATCHER: ['/dashboard', '/trips', '/settings'],
+  SAFETY_OFFICER: ['/dashboard', '/drivers', '/settings'],
+  FINANCIAL_ANALYST: ['/dashboard', '/fuel-expense', '/analytics', '/settings'],
+};
+
 const sidebarVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } },
@@ -27,6 +35,22 @@ const itemVariants = {
 };
 
 export default function Sidebar() {
+  // Retrieve user details from localStorage safely
+  let storedUser = null;
+  try {
+    const item = localStorage.getItem('user');
+    if (item && item !== 'undefined') {
+      storedUser = JSON.parse(item);
+    }
+  } catch (e) {
+    console.error("Failed to parse user session in sidebar", e);
+  }
+  const userRole = storedUser ? storedUser.role : 'DISPATCHER'; // Default fallback
+
+  // Filter allowed paths for the current logged-in role
+  const allowedPaths = rolePermissions[userRole] || ['/dashboard', '/settings'];
+  const filteredNavItems = navItems.filter(item => allowedPaths.includes(item.path));
+
   return (
     <motion.aside
       initial={{ x: -260, opacity: 0 }}
@@ -64,7 +88,7 @@ export default function Sidebar() {
         animate="visible"
         className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-none"
       >
-        {navItems.map(({ path, label, icon: Icon }) => (
+        {filteredNavItems.map(({ path, label, icon: Icon }) => (
           <motion.div key={path} variants={itemVariants}>
             <NavLink to={path}>
               {({ isActive }) => (
@@ -99,12 +123,10 @@ export default function Sidebar() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.9 }}
-        className="px-5 py-4 border-t border-border"
+        transition={{ delay: 0.4 }}
+        className="p-5 border-t border-border mt-auto"
       >
-        <p className="text-[10px] text-text-secondary text-center">
-          TRANSITOPS © 2026 · RBAC ENABLED
-        </p>
+        <p className="text-[10px] text-text-secondary text-center">Version 1.0.0 (Beta)</p>
       </motion.div>
     </motion.aside>
   );

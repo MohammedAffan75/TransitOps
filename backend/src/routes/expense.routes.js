@@ -1,19 +1,22 @@
 import { Router } from 'express';
-import { addFuelLog, addOtherExpense, getVehicleExpenses } from '../controllers/expense.controller.js';
+import { addFuelLog, addOtherExpense, getVehicleExpenses, getAllFuelLogs, getAllExpenses } from '../controllers/expense.controller.js';
 import { requireAuth, requireRole } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// Apply global auth to all expense routes
 router.use(requireAuth);
 
-// Route to add a fuel log
-router.post('/fuel', requireRole(['DRIVER', 'DISPATCHER', 'FLEET_MANAGER', 'FINANCIAL_ANALYST']), addFuelLog);
+// List all fuel logs
+router.get('/fuel', requireRole(['FLEET_MANAGER', 'FINANCIAL_ANALYST', 'DISPATCHER']), getAllFuelLogs);
 
-// Route to add another type of expense (TOLL, MAINTENANCE, OTHER)
-router.post('/other', requireRole(['DRIVER', 'DISPATCHER', 'FLEET_MANAGER', 'FINANCIAL_ANALYST']), addOtherExpense);
+// List all other expenses
+router.get('/other', requireRole(['FLEET_MANAGER', 'FINANCIAL_ANALYST']), getAllExpenses);
 
-// Route to get all expenses for a specific vehicle
+// Get expenses for a specific vehicle
 router.get('/vehicle/:id', requireRole(['FLEET_MANAGER', 'FINANCIAL_ANALYST']), getVehicleExpenses);
+
+// Add fuel log or other expense
+router.post('/fuel', requireRole(['DISPATCHER', 'FLEET_MANAGER', 'FINANCIAL_ANALYST']), addFuelLog);
+router.post('/other', requireRole(['FLEET_MANAGER', 'FINANCIAL_ANALYST']), addOtherExpense);
 
 export default router;

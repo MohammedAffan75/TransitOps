@@ -54,13 +54,31 @@ export default function Login() {
   const onSubmit = async (data) => {
     setIsLoading(true);
     setLoginError(false);
-    await new Promise(r => setTimeout(r, 900));
-    if (data.email === 'wrong@test.com') {
-      setLoginError(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: data.email, password: data.password })
+      });
+      const resData = await response.json();
+      
+      if (!response.ok) {
+        setLoginError(resData.error || resData.message || 'Invalid email or password.');
+        setIsLoading(false);
+        return;
+      }
+      
+      // Store token and user payload
+      localStorage.setItem('accessToken', resData.data.accessToken);
+      localStorage.setItem('refreshToken', resData.data.refreshToken);
+      localStorage.setItem('user', JSON.stringify(resData.data.user));
+      
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Login connection error:', err);
+      setLoginError('Could not connect to the server.');
       setIsLoading(false);
-      return;
     }
-    navigate('/dashboard');
   };
 
   return (
@@ -208,8 +226,12 @@ export default function Login() {
                   <AlertCircle size={16} className="text-danger flex-shrink-0 mt-0.5" />
                 </motion.div>
                 <div>
-                  <p className="text-sm font-semibold text-danger">Invalid credentials.</p>
-                  <p className="text-xs text-danger/80 mt-0.5">Account locked after 5 failed attempts.</p>
+                  <p className="text-sm font-semibold text-danger">
+                    {typeof loginError === 'string' ? loginError : 'Invalid credentials.'}
+                  </p>
+                  {typeof loginError !== 'string' && (
+                    <p className="text-xs text-danger/80 mt-0.5">Account locked after 5 failed attempts.</p>
+                  )}
                 </div>
               </motion.div>
             )}

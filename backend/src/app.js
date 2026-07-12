@@ -18,17 +18,17 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// 3. Limit requests from same API (prevent brute-force/DDoS)
+// 3. Body parser & CORS
+app.use(cors());
+app.use(express.json({ limit: '10kb' })); // limit body payload size
+
+// 4. Limit requests from same API (prevent brute-force/DDoS)
 const limiter = rateLimit({
-  max: 100, // Limit each IP to 100 requests per 15 mins
+  max: 1000, // Increased for dev (React Strict Mode double invokes)
   windowMs: 15 * 60 * 1000,
   message: 'Too many requests from this IP, please try again in 15 minutes!'
 });
 app.use('/api', limiter); // apply to all API routes
-
-// 4. Body parser & CORS
-app.use(cors());
-app.use(express.json({ limit: '10kb' })); // limit body payload size
 
 // 5. API Routes
 app.use('/api', apiRoutes);

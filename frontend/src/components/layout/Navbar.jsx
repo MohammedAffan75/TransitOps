@@ -1,17 +1,42 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Bell, X, Sun, Moon, LogOut } from 'lucide-react';
-import { currentUser } from '../../data/mockData';
+import { Search, X, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { motion, AnimatePresence } from 'framer-motion';
+
+/** Safely read the logged-in user from localStorage. Falls back to a guest object. */
+function getStoredUser() {
+  try {
+    const raw = localStorage.getItem('user');
+    if (!raw || raw === 'undefined' || raw === 'null') return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function formatRole(roleStr = '') {
+  return roleStr.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function getInitials(name = '') {
+  return name.split(' ').map(n => n[0] || '').join('').toUpperCase().substring(0, 2) || '??';
+}
 
 export default function Navbar() {
   const [search, setSearch] = useState('');
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
+  const storedUser = getStoredUser();
+  const user = storedUser
+    ? { name: storedUser.name, role: formatRole(storedUser.role), initials: getInitials(storedUser.name) }
+    : { name: 'Guest', role: 'Dispatcher', initials: 'GU' };
+
   const handleLogout = () => {
-    // Navigate back to login page
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -39,17 +64,9 @@ export default function Navbar() {
 
       <div className="flex-1" />
 
-      {/* Notification Bell */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        className="relative p-2 rounded-lg hover:bg-black/[0.06] dark:hover:bg-white/[0.06] text-text-secondary hover:text-text-primary transition-colors"
-      >
-        <Bell size={18} />
-        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
-      </motion.button>
 
-      {/* ─── Theme Toggle Button ─── */}
+
+      {/* Theme Toggle */}
       <motion.button
         onClick={toggleTheme}
         whileHover={{ scale: 1.1 }}
@@ -59,45 +76,31 @@ export default function Navbar() {
       >
         <AnimatePresence mode="wait" initial={false}>
           {isDark ? (
-            <motion.span
-              key="sun"
-              initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
-              animate={{ opacity: 1, rotate: 0, scale: 1 }}
-              exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center justify-center text-warning"
-            >
+            <motion.span key="sun" initial={{ opacity: 0, rotate: -90, scale: 0.5 }} animate={{ opacity: 1, rotate: 0, scale: 1 }} exit={{ opacity: 0, rotate: 90, scale: 0.5 }} transition={{ duration: 0.2 }} className="flex items-center justify-center text-warning">
               <Sun size={17} />
             </motion.span>
           ) : (
-            <motion.span
-              key="moon"
-              initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
-              animate={{ opacity: 1, rotate: 0, scale: 1 }}
-              exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
-              transition={{ duration: 0.2 }}
-              className="flex items-center justify-center text-blue"
-            >
+            <motion.span key="moon" initial={{ opacity: 0, rotate: 90, scale: 0.5 }} animate={{ opacity: 1, rotate: 0, scale: 1 }} exit={{ opacity: 0, rotate: -90, scale: 0.5 }} transition={{ duration: 0.2 }} className="flex items-center justify-center text-blue">
               <Moon size={17} />
             </motion.span>
           )}
         </AnimatePresence>
       </motion.button>
 
-      {/* Profile */}
+      {/* Profile Badge */}
       <div className="flex items-center gap-3">
         <div className="text-right">
-          <p className="text-sm font-semibold text-text-primary leading-tight">{currentUser.name}</p>
+          <p className="text-sm font-semibold text-text-primary leading-tight">{user.name}</p>
         </div>
         <div className="flex items-center gap-2 bg-blue/20 border border-blue/30 rounded-lg px-3 py-1.5">
-          <span className="text-xs text-blue font-semibold">{currentUser.role}</span>
+          <span className="text-xs text-blue font-semibold">{user.role}</span>
           <div className="w-6 h-6 bg-blue rounded-md flex items-center justify-center">
-            <span className="text-[10px] font-bold text-white">{currentUser.initials}</span>
+            <span className="text-[10px] font-bold text-white">{user.initials}</span>
           </div>
         </div>
       </div>
 
-      {/* ─── Logout Button ─── */}
+      {/* Logout */}
       <motion.button
         onClick={handleLogout}
         whileHover={{ scale: 1.08 }}

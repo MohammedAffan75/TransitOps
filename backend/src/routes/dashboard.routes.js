@@ -4,13 +4,13 @@ import { requireAuth, requireRole } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// Apply global auth to all dashboard routes
+// All dashboard routes require a valid login
 router.use(requireAuth);
 
-// Route to get aggregated dashboard KPIs
-router.get('/kpis', requireRole(['FLEET_MANAGER', 'FINANCIAL_ANALYST']), getKPIs);
+// All logged-in roles can view the summary KPIs
+router.get('/kpis', getKPIs);
 
-// Route to export KPIs to CSV
-router.get('/export', requireRole(['FLEET_MANAGER', 'FINANCIAL_ANALYST']), exportCSV);
+// All logged-in roles can export data
+router.get('/export', exportCSV);
 
 export default router;
