@@ -4,13 +4,14 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: '#111111',
-        sidebar: '#181818',
-        card: '#1E1E1E',
-        border: '#2A2A2A',
+        background: 'var(--color-background)',
+        sidebar: 'var(--color-sidebar)',
+        card: 'var(--color-card)',
+        border: 'var(--color-border)',
         primary: {
           DEFAULT: '#C88719',
           hover: '#D99A2A',
@@ -20,8 +21,8 @@ export default {
         warning: '#F4A62A',
         danger: '#F87171',
         blue: '#5DA9FF',
-        'text-primary': '#FFFFFF',
-        'text-secondary': '#A0A0A0',
+        'text-primary': 'var(--color-text-primary)',
+        'text-secondary': 'var(--color-text-secondary)',
       },
       fontFamily: {
         sans: ['Inter', 'Manrope', 'system-ui', 'sans-serif'],
@@ -40,8 +41,8 @@ export default {
         navbar: '72px',
       },
       boxShadow: {
-        card: '0 4px 24px rgba(0,0,0,0.4)',
-        sidebar: '2px 0 16px rgba(0,0,0,0.3)',
+        card: '0 4px 24px rgba(0,0,0,0.08)',
+        sidebar: '2px 0 16px rgba(0,0,0,0.08)',
         glow: '0 0 20px rgba(200,135,25,0.2)',
       },
     },

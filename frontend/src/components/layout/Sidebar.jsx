@@ -32,7 +32,8 @@ export default function Sidebar() {
       initial={{ x: -20, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="w-[260px] min-h-screen bg-sidebar flex flex-col border-r border-border shadow-sidebar flex-shrink-0"
+      className="w-[260px] min-h-screen bg-sidebar flex flex-col border-r border-border flex-shrink-0 theme-transition"
+      style={{ boxShadow: 'var(--shadow-sidebar)' }}
     >
       {/* Logo */}
       <div className="px-5 py-5 border-b border-border">
@@ -41,7 +42,7 @@ export default function Sidebar() {
             <Zap size={18} className="text-white" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-white tracking-tight">TransitOps</h1>
+            <h1 className="text-base font-bold text-text-primary tracking-tight">TransitOps</h1>
             <p className="text-[10px] text-text-secondary">Smart Transport Platform</p>
           </div>
         </div>

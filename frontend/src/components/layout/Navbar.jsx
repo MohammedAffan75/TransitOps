@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Search, Bell, X } from 'lucide-react';
+import { Search, Bell, X, Sun, Moon } from 'lucide-react';
 import { currentUser } from '../../data/mockData';
-import { motion } from 'framer-motion';
+import { useTheme } from '../../hooks/useTheme';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Navbar() {
   const [search, setSearch] = useState('');
-  const [showNotif, setShowNotif] = useState(false);
+  const { isDark, toggleTheme } = useTheme();
 
   return (
-    <header className="h-[72px] bg-sidebar border-b border-border flex items-center px-6 gap-4 flex-shrink-0">
+    <header className="h-[72px] bg-sidebar border-b border-border flex items-center px-6 gap-4 flex-shrink-0 theme-transition">
       {/* Search */}
       <div className="relative flex-1 max-w-sm">
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none" />
@@ -22,7 +23,7 @@ export default function Navbar() {
         {search && (
           <button
             onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-white"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
           >
             <X size={12} />
           </button>
@@ -35,17 +36,51 @@ export default function Navbar() {
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setShowNotif(!showNotif)}
-        className="relative p-2 rounded-lg hover:bg-white/[0.06] text-text-secondary hover:text-white transition-colors"
+        className="relative p-2 rounded-lg hover:bg-black/[0.06] dark:hover:bg-white/[0.06] text-text-secondary hover:text-text-primary transition-colors"
       >
         <Bell size={18} />
         <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
       </motion.button>
 
+      {/* ─── Theme Toggle Button ─── */}
+      <motion.button
+        onClick={toggleTheme}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9, rotate: 15 }}
+        className="relative p-2 rounded-lg border border-border text-text-secondary hover:text-text-primary hover:border-primary transition-all duration-200 overflow-hidden"
+        title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          {isDark ? (
+            <motion.span
+              key="sun"
+              initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center justify-center text-warning"
+            >
+              <Sun size={17} />
+            </motion.span>
+          ) : (
+            <motion.span
+              key="moon"
+              initial={{ opacity: 0, rotate: 90, scale: 0.5 }}
+              animate={{ opacity: 1, rotate: 0, scale: 1 }}
+              exit={{ opacity: 0, rotate: -90, scale: 0.5 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center justify-center text-blue"
+            >
+              <Moon size={17} />
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </motion.button>
+
       {/* Profile */}
       <div className="flex items-center gap-3">
         <div className="text-right">
-          <p className="text-sm font-semibold text-white leading-tight">{currentUser.name}</p>
+          <p className="text-sm font-semibold text-text-primary leading-tight">{currentUser.name}</p>
         </div>
         <div className="flex items-center gap-2 bg-blue/20 border border-blue/30 rounded-lg px-3 py-1.5">
           <span className="text-xs text-blue font-semibold">{currentUser.role}</span>
