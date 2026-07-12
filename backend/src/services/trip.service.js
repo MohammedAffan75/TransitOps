@@ -17,6 +17,10 @@ export async function createDraftTrip(data) {
     throw new ApiError(400,`Vehicle with ID ${vehicleId} not found.`);
   }
 
+  if (Number(cargoWeight) > Number(vehicle.capacity)) {
+    throw new ApiError(400, `Cargo weight (${cargoWeight} kg) exceeds vehicle's maximum capacity (${vehicle.capacity} kg).`);
+  }
+
   // Verify driver exists
   const driver = await prisma.driver.findUnique({ where: { id: Number(driverId) } });
   if (!driver) {
@@ -179,6 +183,54 @@ export async function completeTrip(tripId) {
           }
         }
       });
+    }
+
+    return updatedTrip;
+  });
+}
+
+/**
+ * Atomically cancels a trip and restores vehicle/driver status if dispatched.
+ */
+export async function cancelTrip(tripId) {
+  const id = Number(tripId);
+
+  const trip = await prisma.trip.findUnique({
+    where: { id },
+    include: {
+      vehicle: true,
+      driver: true
+    }
+  });
+
+  if (!trip) {
+    throw new ApiError(400,`Trip with ID ${tripId} not found.`);
+  }
+
+  if (trip.status === 'COMPLETED' || trip.status === 'CANCELLED') {
+    throw new ApiError(400,`Trip cannot be cancelled because it is already ${trip.status}.`);
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    const updatedTrip = await tx.trip.update({
+      where: { id },
+      data: { status: 'CANCELLED' }
+    });
+
+    // Only restore if it was dispatched (since DRAFT doesn't lock assets)
+    if (trip.status === 'DISPATCHED') {
+      if (trip.vehicle) {
+        await tx.vehicle.update({
+          where: { id: trip.vehicle.id },
+          data: { status: 'AVAILABLE' }
+        });
+      }
+      if (trip.driver) {
+        await tx.driver.update({
+          where: { id: trip.driver.id },
+          data: { status: 'AVAILABLE' }
+        });
+      }
     }
 
     return updatedTrip;

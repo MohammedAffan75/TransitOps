@@ -20,6 +20,9 @@ export const addFuelLog = async (data) => {
     if (!trip) {
       throw new ApiError(404, `Trip with ID ${tripId} not found.`);
     }
+    if (trip.vehicleId !== Number(vehicleId)) {
+      throw new ApiError(400, `Trip ${tripId} does not belong to vehicle ${vehicleId}.`);
+    }
   }
 
   return await prisma.fuelLog.create({
@@ -53,6 +56,9 @@ export const addOtherExpense = async (data) => {
     const trip = await prisma.trip.findUnique({ where: { id: Number(tripId) } });
     if (!trip) {
       throw new ApiError(404, `Trip with ID ${tripId} not found.`);
+    }
+    if (trip.vehicleId !== Number(vehicleId)) {
+      throw new ApiError(400, `Trip ${tripId} does not belong to vehicle ${vehicleId}.`);
     }
   }
 

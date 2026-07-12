@@ -30,3 +30,13 @@ export const completeTrip = asyncHandler(async (req, res) => {
   const trip = await tripService.completeTrip(id);
   res.status(200).json(new ApiResponse(200, trip, 'Trip completed successfully. Vehicle and driver are now unlocked.'));
 });
+
+/**
+ * Handle POST /api/trips/:id/cancel
+ * Atomically cancels a trip and releases resources.
+ */
+export const cancelTrip = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const trip = await tripService.cancelTrip(id);
+  res.status(200).json(new ApiResponse(200, trip, 'Trip cancelled successfully. Vehicle and driver are available again.'));
+});

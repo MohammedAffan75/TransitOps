@@ -1,4 +1,5 @@
 import { verifyToken } from '../utils/auth.utils.js';
+import ApiError from '../utils/ApiError.js';
 
 /**
  * Middleware to verify a valid JWT access token and attach user payload to the request.
@@ -8,15 +9,13 @@ export function requireAuth(req, res, next) {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        error: 'Access token required. Please provide header format: Authorization: Bearer <token>' 
-      });
+      return next(new ApiError(401, 'Access token required. Please provide header format: Authorization: Bearer <token>'));
     }
 
     const token = authHeader.split(' ')[1];
 
     if (!token) {
-      return res.status(401).json({ error: 'Invalid format. Token is missing.' });
+      return next(new ApiError(401, 'Invalid format. Token is missing.'));
     }
 
     try {
@@ -25,13 +24,13 @@ export function requireAuth(req, res, next) {
       return next();
     } catch (err) {
       if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ error: 'Access token has expired.' });
+        return next(new ApiError(401, 'Access token has expired.'));
       }
-      return res.status(401).json({ error: 'Invalid access token.' });
+      return next(new ApiError(401, 'Invalid access token.'));
     }
   } catch (error) {
     console.error('Error in requireAuth middleware:', error);
-    return res.status(500).json({ error: 'Internal server error in auth verification.' });
+    return next(new ApiError(500, 'Internal server error in auth verification.'));
   }
 }
 
@@ -43,15 +42,13 @@ export function requireAuth(req, res, next) {
 export function requireRole(allowedRoles) {
   return (req, res, next) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required.' });
+      return next(new ApiError(401, 'Authentication required.'));
     }
 
     const { role } = req.user;
 
     if (!allowedRoles.includes(role)) {
-      return res.status(403).json({ 
-        error: `Access forbidden. Authorized roles: ${allowedRoles.join(', ')}` 
-      });
+      return next(new ApiError(403, `Access forbidden. Authorized roles: ${allowedRoles.join(', ')}`));
     }
 
     return next();

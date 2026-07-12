@@ -1,62 +1,78 @@
 import prisma from '../config/prisma.js';
-import ApiError from '../utils/ApiError.js';
 
 /**
  * Retrieves aggregated KPIs for the Fleet Manager dashboard.
  * @returns {Promise<object>} Dashboard metrics object
  */
 export async function getDashboardKPIs() {
-  try {
-    // 1. Total Active Vehicles (AVAILABLE status)
-    const activeVehicles = await prisma.vehicle.count({
-      where: {
-        status: 'AVAILABLE'
-      }
-    });
+  // 1. Vehicles
+  const totalVehicles = await prisma.vehicle.count();
+  const activeVehicles = await prisma.vehicle.count({ 
+    where: { status: { in: ['AVAILABLE', 'ON_TRIP'] } } 
+  });
+  const availableVehicles = await prisma.vehicle.count({ 
+    where: { status: 'AVAILABLE' } 
+  });
+  const vehiclesInShop = await prisma.vehicle.count({ 
+    where: { status: 'IN_SHOP' } 
+  });
 
-    // 2. Ongoing Trips (DISPATCHED status)
-    const ongoingTrips = await prisma.trip.count({
-      where: {
-        status: 'DISPATCHED'
-      }
-    });
+  // Fleet Utilization = (Active Vehicles / Total Vehicles) * 100
+  const fleetUtilization = totalVehicles > 0 ? ((activeVehicles / totalVehicles) * 100).toFixed(2) : 0;
 
-    // 3. Total Revenue (Sum of revenue for all COMPLETED trips)
-    const revenueSum = await prisma.trip.aggregate({
-      _sum: {
-        revenue: true
-      },
-      where: {
-        status: 'COMPLETED'
-      }
-    });
-    const totalRevenue = Number(revenueSum._sum.revenue || 0);
+  // 2. Trips & Drivers
+  const activeTrips = await prisma.trip.count({ where: { status: 'DISPATCHED' } });
+  const pendingTrips = await prisma.trip.count({ where: { status: 'DRAFT' } });
+  const driversOnDuty = await prisma.driver.count({ where: { status: 'ON_TRIP' } });
 
-    // 4. Total Expenses (Sum of all Expense amounts + FuelLog costs)
-    const expenseSum = await prisma.expense.aggregate({
-      _sum: {
-        amount: true
-      }
-    });
-    const totalExpenseAmount = Number(expenseSum._sum.amount || 0);
+  // 3. Costs, Revenue & Distance
+  // Summing revenue and distance from completed trips
+  const revenueAgg = await prisma.trip.aggregate({ 
+    _sum: { revenue: true, distance: true }, 
+    where: { status: 'COMPLETED' } 
+  });
+  const totalRevenue = Number(revenueAgg._sum.revenue || 0);
+  const totalDistance = Number(revenueAgg._sum.distance || 0);
 
-    const fuelLogSum = await prisma.fuelLog.aggregate({
-      _sum: {
-        cost: true
-      }
-    });
-    const totalFuelCost = Number(fuelLogSum._sum.cost || 0);
+  // Summing Maintenance Cost
+  const maintenanceAgg = await prisma.maintenanceRecord.aggregate({ 
+    _sum: { cost: true } 
+  });
+  const totalMaintenance = Number(maintenanceAgg._sum.cost || 0);
 
-    const totalExpenses = totalExpenseAmount + totalFuelCost;
+  // Summing Fuel Cost and Liters
+  const fuelAgg = await prisma.fuelLog.aggregate({ 
+    _sum: { cost: true, liters: true } 
+  });
+  const totalFuelCost = Number(fuelAgg._sum.cost || 0);
+  const totalFuelLiters = Number(fuelAgg._sum.liters || 0);
 
-    return {
-      totalActiveVehicles: activeVehicles,
-      ongoingTrips,
-      totalRevenue,
-      totalExpenses
-    };
-  } catch (error) {
-    console.error('Error in getDashboardKPIs service:', error);
-    throw new ApiError(500, 'Error compiling dashboard KPI statistics');
-  }
+  // Operational Cost (Fuel + Maintenance)
+  const operationalCost = totalMaintenance + totalFuelCost;
+
+  // Fuel Efficiency (Distance / Fuel)
+  const fuelEfficiency = totalFuelLiters > 0 ? (totalDistance / totalFuelLiters).toFixed(2) : 0;
+
+  // 4. Vehicle ROI
+  const acqAgg = await prisma.vehicle.aggregate({ 
+    _sum: { acquisitionCost: true } 
+  });
+  const totalAcquisitionCost = Number(acqAgg._sum.acquisitionCost || 0);
+  
+  // Vehicle ROI ((Revenue - Operational Cost) / Acquisition Cost)
+  const vehicleROI = totalAcquisitionCost > 0 ? (((totalRevenue - operationalCost) / totalAcquisitionCost) * 100).toFixed(2) : 0;
+
+  return {
+    activeVehicles,
+    availableVehicles,
+    vehiclesInShop,
+    activeTrips,
+    pendingTrips,
+    driversOnDuty,
+    fleetUtilization: Number(fleetUtilization),
+    totalRevenue,
+    operationalCost,
+    fuelEfficiency: Number(fuelEfficiency),
+    vehicleROI: Number(vehicleROI)
+  };
 }

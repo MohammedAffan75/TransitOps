@@ -20,9 +20,12 @@ export async function sendVehicleToShop(data) {
     throw new ApiError(400,`Vehicle with ID ${vehicleId} not found.`);
   }
 
-  // 2. Validate vehicle is not on trip
+  // 2. Validate vehicle is not on trip or retired
   if (vehicle.status === 'ON_TRIP') {
     throw new ApiError(400,`Vehicle is currently ON_TRIP and cannot be sent to the shop.`);
+  }
+  if (vehicle.status === 'RETIRED') {
+    throw new ApiError(400,`Vehicle is RETIRED and cannot be sent to the shop.`);
   }
 
   const recordDate = date ? new Date(date) : new Date();
@@ -79,11 +82,13 @@ export async function completeMaintenance(recordId) {
       data: { status: 'COMPLETED' }
     });
 
-    // B. Restore vehicle status back to AVAILABLE
-    await tx.vehicle.update({
-      where: { id: record.vehicleId },
-      data: { status: 'AVAILABLE' }
-    });
+    // B. Restore vehicle status back to AVAILABLE (unless manually retired while in shop)
+    if (record.vehicle.status !== 'RETIRED') {
+      await tx.vehicle.update({
+        where: { id: record.vehicleId },
+        data: { status: 'AVAILABLE' }
+      });
+    }
 
     return updatedRecord;
   });

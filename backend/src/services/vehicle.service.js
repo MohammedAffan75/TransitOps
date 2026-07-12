@@ -54,7 +54,7 @@ export const getVehicles = async (filters) => {
 export const getDispatchableVehicles = async () => {
   const vehicles = await prisma.vehicle.findMany({
     where: { status: 'AVAILABLE' },
-    orderBy: { name: 'asc' }
+    orderBy: { model: 'asc' }
   });
 
   return vehicles.map(mapVehicle);
