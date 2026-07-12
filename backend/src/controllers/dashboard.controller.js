@@ -9,3 +9,15 @@ export const getKPIs = asyncHandler(async (req, res) => {
   const kpis = await dashboardService.getDashboardKPIs();
   res.status(200).json(new ApiResponse(200, kpis, 'Dashboard KPIs retrieved successfully'));
 });
+
+// @desc    Export KPIs to CSV
+// @route   GET /api/dashboard/export
+// @access  Private
+export const exportCSV = asyncHandler(async (req, res) => {
+  const csvData = await dashboardService.exportKPIsToCSV();
+  
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="transitops_kpis.csv"');
+  
+  return res.status(200).send(csvData);
+});

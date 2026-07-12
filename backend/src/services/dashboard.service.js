@@ -76,3 +76,28 @@ export async function getDashboardKPIs() {
     vehicleROI: Number(vehicleROI)
   };
 }
+
+/**
+ * Generates a CSV string containing the dashboard KPIs.
+ * @returns {Promise<string>} CSV formatted string
+ */
+export async function exportKPIsToCSV() {
+  const kpis = await getDashboardKPIs();
+  
+  const header = 'Metric,Value\n';
+  const rows = [
+    `Total Active Vehicles,${kpis.activeVehicles}`,
+    `Available Vehicles,${kpis.availableVehicles}`,
+    `Vehicles In Shop,${kpis.vehiclesInShop}`,
+    `Active Trips,${kpis.activeTrips}`,
+    `Pending Trips,${kpis.pendingTrips}`,
+    `Drivers On Duty,${kpis.driversOnDuty}`,
+    `Fleet Utilization (%),${kpis.fleetUtilization}`,
+    `Total Revenue ($),${kpis.totalRevenue}`,
+    `Operational Cost ($),${kpis.operationalCost}`,
+    `Fuel Efficiency (km/L),${kpis.fuelEfficiency}`,
+    `Vehicle ROI (%),${kpis.vehicleROI}`
+  ].join('\n');
+
+  return header + rows;
+}
