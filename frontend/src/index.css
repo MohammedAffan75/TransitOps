@@ -4,6 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Dark Mode (default) ─── */
+:root,
+.dark {
+  --color-background:    #111111;
+  --color-sidebar:       #181818;
+  --color-card:          #1E1E1E;
+  --color-border:        #2A2A2A;
+  --color-text-primary:  #FFFFFF;
+  --color-text-secondary:#A0A0A0;
+  --shadow-card:         0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-sidebar:      2px 0 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Light Mode ─── */
+.light {
+  --color-background:    #F0F2F5;
+  --color-sidebar:       #FFFFFF;
+  --color-card:          #FFFFFF;
+  --color-border:        #E2E6EA;
+  --color-text-primary:  #111111;
+  --color-text-secondary:#4B5563;
+  --shadow-card:         0 4px 24px rgba(0, 0, 0, 0.07);
+  --shadow-sidebar:      2px 0 16px rgba(0, 0, 0, 0.06);
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -12,12 +37,13 @@
   }
 
   html, body {
-    background-color: #111111;
-    color: #FFFFFF;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
     font-family: 'Inter', 'Manrope', system-ui, sans-serif;
     height: 100%;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   #root {
@@ -30,11 +56,11 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #181818;
+    background: var(--color-sidebar);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #2A2A2A;
+    background: var(--color-border);
     border-radius: 3px;
   }
 
@@ -46,6 +72,15 @@
     filter: invert(0.6);
     cursor: pointer;
   }
+
+  .light input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.2);
+  }
+
+  select option {
+    background-color: var(--color-card);
+    color: var(--color-text-primary);
+  }
 }
 
 @layer components {
@@ -54,7 +89,7 @@
   }
 
   .btn-secondary {
-    @apply bg-card hover:bg-border text-white font-medium px-5 py-2.5 rounded-btn border border-border transition-all duration-200 active:scale-95;
+    @apply bg-card hover:bg-border text-text-primary font-medium px-5 py-2.5 rounded-btn border border-border transition-all duration-200 active:scale-95;
   }
 
   .btn-danger {
@@ -62,19 +97,37 @@
   }
 
   .card {
-    @apply bg-card border border-border rounded-card p-5 shadow-card;
+    @apply bg-card border border-border rounded-card p-5;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 
   .input-field {
-    @apply bg-background border border-border rounded-btn px-4 py-2.5 text-white placeholder-text-secondary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-200 w-full text-sm;
+    @apply bg-background border border-border rounded-btn px-4 py-2.5 text-text-primary placeholder-text-secondary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-200 w-full text-sm;
   }
 
   .table-row-hover {
-    @apply hover:bg-white/[0.06] transition-colors duration-150 cursor-pointer;
+    @apply hover:bg-black/[0.03] transition-colors duration-150 cursor-pointer;
+  }
+
+  .light .table-row-hover {
+    @apply hover:bg-black/[0.04];
+  }
+
+  .dark .table-row-hover {
+    @apply hover:bg-white/[0.06];
   }
 
   .sidebar-item {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-white hover:bg-white/[0.06] transition-all duration-200 cursor-pointer text-sm font-medium;
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary hover:text-text-primary transition-all duration-200 cursor-pointer text-sm font-medium;
+  }
+
+  .sidebar-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .dark .sidebar-item:hover {
+    background-color: rgba(255, 255, 255, 0.06);
   }
 
   .sidebar-item-active {
@@ -90,7 +143,9 @@
   }
 
   .kpi-card {
-    @apply bg-card border border-border rounded-card p-4 flex flex-col gap-1 shadow-card;
+    @apply bg-card border border-border rounded-card p-4 flex flex-col gap-1;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
   }
 }
 
@@ -106,6 +161,10 @@
     background: linear-gradient(180deg, #181818 0%, #141414 100%);
   }
 
+  .light .bg-sidebar-gradient {
+    background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+  }
+
   .border-glow {
     box-shadow: 0 0 0 1px rgba(200, 135, 25, 0.3);
   }
@@ -118,4 +177,25 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
+
+  .theme-transition {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Light mode overrides for text-white and table elements */
+.light .text-white:not(.btn-primary):not(.btn-primary *):not(.sidebar-item-active):not(.sidebar-item-active *):not([class*="bg-primary"]):not([class*="bg-danger"]):not([class*="bg-success"]):not([class*="bg-warning"]):not([class*="bg-blue"]):not([class*="bg-"]) {
+  color: var(--color-text-primary) !important;
+}
+
+.light .text-white\/90:not([class*="bg-"]) {
+  color: var(--color-text-primary) !important;
+}
+
+.light table th {
+  color: var(--color-text-secondary);
+}
+
+.light table td {
+  color: var(--color-text-primary);
 }

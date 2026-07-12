@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Search, Bell, X, Sun, Moon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Bell, X, Sun, Moon, LogOut } from 'lucide-react';
 import { currentUser } from '../../data/mockData';
 import { useTheme } from '../../hooks/useTheme';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,6 +8,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Navbar() {
   const [search, setSearch] = useState('');
   const { isDark, toggleTheme } = useTheme();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Navigate back to login page
+    navigate('/login');
+  };
 
   return (
     <header className="h-[72px] bg-sidebar border-b border-border flex items-center px-6 gap-4 flex-shrink-0 theme-transition">
@@ -47,7 +54,7 @@ export default function Navbar() {
         onClick={toggleTheme}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9, rotate: 15 }}
-        className="relative p-2 rounded-lg border border-border text-text-secondary hover:text-text-primary hover:border-primary transition-all duration-200 overflow-hidden"
+        className="relative p-2 rounded-lg border border-border text-text-secondary hover:text-text-primary hover:border-primary transition-all duration-200 overflow-hidden bg-card"
         title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
       >
         <AnimatePresence mode="wait" initial={false}>
@@ -89,6 +96,18 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* ─── Logout Button ─── */}
+      <motion.button
+        onClick={handleLogout}
+        whileHover={{ scale: 1.08 }}
+        whileTap={{ scale: 0.95 }}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-danger/10 hover:bg-danger/20 border border-danger/30 text-danger text-xs font-semibold transition-all duration-200"
+        title="Log Out"
+      >
+        <LogOut size={15} />
+        <span className="hidden sm:inline">Logout</span>
+      </motion.button>
     </header>
   );
 }

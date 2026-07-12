@@ -84,7 +84,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Recent Trips */}
         <div className="lg:col-span-2 card">
-          <h2 className="text-sm font-bold text-white mb-4">Recent Trips</h2>
+          <h2 className="text-sm font-bold text-text-primary mb-4">Recent Trips</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
@@ -104,7 +104,7 @@ export default function Dashboard() {
                   transition={{ delay: i * 0.06 }}
                   className="table-row-hover border-b border-border/40 last:border-0"
                 >
-                  <td className="py-3 pr-4 font-semibold text-white">{trip.id}</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">{trip.id}</td>
                   <td className="py-3 pr-4 text-text-secondary">{trip.vehicleName}</td>
                   <td className="py-3 pr-4 text-text-secondary">{trip.driverName}</td>
                   <td className="py-3 pr-4">
@@ -119,7 +119,7 @@ export default function Dashboard() {
 
         {/* Vehicle Status */}
         <div className="card">
-          <h2 className="text-sm font-bold text-white mb-5">Vehicle Status</h2>
+          <h2 className="text-sm font-bold text-text-primary mb-5">Vehicle Status</h2>
           <div className="space-y-4">
             {vehicleStatusBars.map(({ label, value, color }, i) => (
               <motion.div
@@ -130,7 +130,7 @@ export default function Dashboard() {
               >
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs text-text-secondary">{label}</span>
-                  <span className="text-xs font-semibold text-white">{value}%</span>
+                  <span className="text-xs font-semibold text-text-primary">{value}%</span>
                 </div>
                 <div className="h-2.5 bg-white/[0.06] rounded-full overflow-hidden">
                   <motion.div

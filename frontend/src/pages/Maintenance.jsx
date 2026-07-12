@@ -43,7 +43,7 @@ export default function Maintenance() {
       {/* Left: Form */}
       <div className="space-y-5">
         <div className="card">
-          <h2 className="text-sm font-bold text-white mb-5">Log Service Record</h2>
+          <h2 className="text-sm font-bold text-text-primary mb-5">Log Service Record</h2>
           <form onSubmit={handleSubmit(onSave)} className="space-y-4">
             <div>
               <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider block mb-1.5">Vehicle</label>
@@ -101,7 +101,7 @@ export default function Maintenance() {
 
       {/* Right: Service Log Table */}
       <div className="card">
-        <h2 className="text-sm font-bold text-white mb-4">Service Log</h2>
+        <h2 className="text-sm font-bold text-text-primary mb-4">Service Log</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -124,7 +124,7 @@ export default function Maintenance() {
                 >
                   <td className="py-3 pr-4 font-semibold">{record.vehicleName}</td>
                   <td className="py-3 pr-4 text-text-secondary">{record.service}</td>
-                  <td className="py-3 pr-4 font-semibold text-white">₹{record.cost.toLocaleString()}</td>
+                  <td className="py-3 pr-4 font-semibold text-text-primary">₹{record.cost.toLocaleString()}</td>
                   <td className="py-3">
                     <StatusBadge
                       status={record.status === 'Active' ? 'In Shop' : record.status === 'Pending' ? 'Pending' : 'Completed'}

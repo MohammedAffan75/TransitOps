@@ -30,10 +30,10 @@ export default function Modal({ isOpen, onClose, title, children, maxWidth = 'ma
             className={`bg-card border border-border rounded-card shadow-[0_24px_64px_rgba(0,0,0,0.6)] w-full ${maxWidth}`}
           >
             <div className="flex items-center justify-between p-5 border-b border-border">
-              <h2 className="text-base font-bold text-white">{title}</h2>
+              <h2 className="text-base font-bold text-text-primary">{title}</h2>
               <button
                 onClick={onClose}
-                className="p-1.5 rounded-md hover:bg-white/10 text-text-secondary hover:text-white transition-colors"
+                className="p-1.5 rounded-md hover:bg-white/10 text-text-secondary hover:text-text-primary transition-colors"
               >
                 <X size={16} />
               </button>

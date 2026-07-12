@@ -57,7 +57,7 @@ export default function FuelExpense() {
       {/* Fuel Logs Section */}
       <div className="card">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+          <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
             <Fuel size={15} className="text-primary" />
             Fuel Logs
           </h2>
@@ -72,7 +72,7 @@ export default function FuelExpense() {
             <motion.button
               whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
               onClick={() => setShowExpenseModal(true)}
-              className="bg-card border border-border hover:bg-white/10 text-white font-semibold px-4 py-2 rounded-btn text-sm flex items-center gap-1.5 transition-all"
+              className="bg-card border border-border hover:bg-white/10 text-text-primary font-semibold px-4 py-2 rounded-btn text-sm flex items-center gap-1.5 transition-all"
             >
               <Plus size={13} />+ Add Expense
             </motion.button>
@@ -101,7 +101,7 @@ export default function FuelExpense() {
                   {new Date(log.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </td>
                 <td className="py-3 pr-6 font-semibold text-blue">{log.liters} L</td>
-                <td className="py-3 font-semibold text-white">₹{log.fuelCost.toLocaleString()}</td>
+                <td className="py-3 font-semibold text-text-primary">₹{log.fuelCost.toLocaleString()}</td>
               </motion.tr>
             ))}
           </tbody>
@@ -110,7 +110,7 @@ export default function FuelExpense() {
 
       {/* Other Expenses */}
       <div className="card">
-        <h2 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-bold text-text-primary mb-4 flex items-center gap-2">
           <Receipt size={15} className="text-primary" />
           Other Expenses (Toll / Misc)
         </h2>
@@ -138,7 +138,7 @@ export default function FuelExpense() {
                 <td className="py-3 pr-4 text-text-secondary">
                   {exp.maintenance > 0 ? `₹${exp.maintenance.toLocaleString()}` : '0'}
                 </td>
-                <td className="py-3 font-semibold text-white">
+                <td className="py-3 font-semibold text-text-primary">
                   ₹{exp.total?.toLocaleString() ?? '0'}
                 </td>
               </motion.tr>

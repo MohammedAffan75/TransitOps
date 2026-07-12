@@ -128,7 +128,7 @@ export default function Trips() {
 
         {/* Create Trip Form */}
         <div className="card">
-          <h2 className="text-sm font-bold text-white mb-4">Create Trip</h2>
+          <h2 className="text-sm font-bold text-text-primary mb-4">Create Trip</h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <FormInput
               label="Source"
@@ -196,8 +196,8 @@ export default function Trips() {
                   exit={{ opacity: 0, y: -5 }}
                   className="p-3.5 bg-danger/10 border border-danger/30 rounded-card text-xs space-y-1"
                 >
-                  <div className="text-text-secondary">Vehicle Capacity: <span className="text-white">{selectedVehicle?.capacityKg} kg</span></div>
-                  <div className="text-text-secondary">Cargo Weight: <span className="text-white">{watchCargoWeight} kg</span></div>
+                  <div className="text-text-secondary">Vehicle Capacity: <span className="text-text-primary">{selectedVehicle?.capacityKg} kg</span></div>
+                  <div className="text-text-secondary">Cargo Weight: <span className="text-text-primary">{watchCargoWeight} kg</span></div>
                   <div className="flex items-center gap-1.5 text-danger font-semibold">
                     <AlertTriangle size={12} />
                     Capacity exceeded by {watchCargoWeight - selectedVehicle?.capacityKg} kg — dispatch blocked
@@ -236,7 +236,7 @@ export default function Trips() {
       {/* Right: Live Board */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-white">Live Board</h2>
+          <h2 className="text-sm font-bold text-text-primary">Live Board</h2>
           <span className="text-xs text-text-secondary">{trips.length} trips</span>
         </div>
         <div className="space-y-3">
@@ -255,7 +255,7 @@ export default function Trips() {
                 </div>
                 <span className="text-xs text-text-secondary">{trip.eta || '—'}</span>
               </div>
-              <p className="text-sm font-semibold text-white mb-2.5">
+              <p className="text-sm font-semibold text-text-primary mb-2.5">
                 {trip.source} → {trip.destination}
               </p>
               <StatusBadge status={trip.status} />

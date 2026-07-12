@@ -45,7 +45,7 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Revenue Bar Chart */}
         <div className="card">
-          <h2 className="text-sm font-bold text-white mb-5">Monthly Revenue</h2>
+          <h2 className="text-sm font-bold text-text-primary mb-5">Monthly Revenue</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={analyticsData.monthlyRevenue} barSize={28} margin={{ top: 0, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="#2A2A2A" />
@@ -77,7 +77,7 @@ export default function Analytics() {
 
         {/* Top Costliest Vehicles */}
         <div className="card">
-          <h2 className="text-sm font-bold text-white mb-5">Top Costliest Vehicles</h2>
+          <h2 className="text-sm font-bold text-text-primary mb-5">Top Costliest Vehicles</h2>
           <div className="space-y-5">
             {analyticsData.costliestVehicles.map((vehicle, i) => {
               const colors = ['#F87171', '#F4A62A', '#5DA9FF'];
@@ -90,7 +90,7 @@ export default function Analytics() {
                   transition={{ delay: i * 0.1 }}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-white">{vehicle.name}</span>
+                    <span className="text-sm font-semibold text-text-primary">{vehicle.name}</span>
                     <span className="text-xs text-text-secondary">₹{vehicle.cost.toLocaleString()}</span>
                   </div>
                   <div className="h-3 bg-white/[0.06] rounded-full overflow-hidden">

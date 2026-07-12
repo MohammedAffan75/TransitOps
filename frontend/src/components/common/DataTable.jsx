@@ -38,7 +38,7 @@ export default function DataTable({ columns, data, globalFilter, onGlobalFilterC
                   <th
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
-                    className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider cursor-pointer hover:text-white transition-colors select-none whitespace-nowrap"
+                    className="px-4 py-3 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider cursor-pointer hover:text-text-primary transition-colors select-none whitespace-nowrap"
                   >
                     <div className="flex items-center gap-1.5">
                       {flexRender(header.column.columnDef.header, header.getContext())}
@@ -68,7 +68,7 @@ export default function DataTable({ columns, data, globalFilter, onGlobalFilterC
                     className="table-row-hover border-b border-border/50 last:border-0"
                   >
                     {row.getVisibleCells().map(cell => (
-                      <td key={cell.id} className="px-4 py-3 text-white/90 whitespace-nowrap">
+                      <td key={cell.id} className="px-4 py-3 text-text-primary whitespace-nowrap">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}

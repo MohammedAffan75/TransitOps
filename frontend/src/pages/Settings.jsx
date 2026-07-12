@@ -23,7 +23,7 @@ export default function Settings() {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* General Settings */}
       <div className="card">
-        <h2 className="text-sm font-bold text-white mb-5">General</h2>
+        <h2 className="text-sm font-bold text-text-primary mb-5">General</h2>
         <form onSubmit={handleSubmit(onSave)} className="space-y-4">
           <div>
             <label className="text-xs font-semibold text-text-secondary uppercase tracking-wider block mb-1.5">Depot Name</label>
@@ -73,7 +73,7 @@ export default function Settings() {
 
       {/* RBAC Table */}
       <div className="card">
-        <h2 className="text-sm font-bold text-white mb-5">Role-Based Access (RBAC)</h2>
+        <h2 className="text-sm font-bold text-text-primary mb-5">Role-Based Access (RBAC)</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -94,7 +94,7 @@ export default function Settings() {
                   transition={{ delay: i * 0.07 }}
                   className="table-row-hover border-b border-border/40 last:border-0"
                 >
-                  <td className="py-3 pr-3 font-semibold text-white">{row.role}</td>
+                  <td className="py-3 pr-3 font-semibold text-text-primary">{row.role}</td>
                   {[
                     row.fleet, row.drivers, row.trips, row.fuelExp, row.analytics
                   ].map((val, j) => (
