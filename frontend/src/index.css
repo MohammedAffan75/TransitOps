@@ -107,15 +107,15 @@
   }
 
   .table-row-hover {
-    @apply hover:bg-black/[0.03] transition-colors duration-150 cursor-pointer;
+    @apply transition-colors duration-150 cursor-pointer;
   }
 
-  .light .table-row-hover {
-    @apply hover:bg-black/[0.04];
+  .light .table-row-hover:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
   }
 
-  .dark .table-row-hover {
-    @apply hover:bg-white/[0.06];
+  .dark .table-row-hover:hover {
+    background-color: rgba(255, 255, 255, 0.06) !important;
   }
 
   .sidebar-item {
@@ -183,12 +183,12 @@
   }
 }
 
-/* Light mode overrides for text-white and table elements */
-.light .text-white:not(.btn-primary):not(.btn-primary *):not(.sidebar-item-active):not(.sidebar-item-active *):not([class*="bg-primary"]):not([class*="bg-danger"]):not([class*="bg-success"]):not([class*="bg-warning"]):not([class*="bg-blue"]):not([class*="bg-"]) {
+/* ─── Light mode overrides for text and backgrounds ─── */
+.light .text-white:not(.btn-primary):not(.btn-primary *):not(.sidebar-item-active):not(.sidebar-item-active *):not([class*="bg-primary"]):not([class*="bg-danger"]):not([class*="bg-success"]):not([class*="bg-warning"]):not([class*="bg-blue"]) {
   color: var(--color-text-primary) !important;
 }
 
-.light .text-white\/90:not([class*="bg-"]) {
+.light .text-white\/90 {
   color: var(--color-text-primary) !important;
 }
 
@@ -198,4 +198,16 @@
 
 .light table td {
   color: var(--color-text-primary);
+}
+
+.light [class*="bg-white/"]:not(.btn-primary):not(.sidebar-item-active):not([class*="bg-primary"]) {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.light [class*="hover:bg-white/"]:hover:not(.btn-primary):not(.sidebar-item-active) {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.light table thead tr {
+  background-color: rgba(0, 0, 0, 0.03) !important;
 }
