@@ -3,11 +3,18 @@ import cors from 'cors';
 import errorHandler from './middlewares/errorHandler.js';
 import ApiError from './utils/ApiError.js';
 
+import vehicleRoutes from './routes/vehicle.routes.js';
+import driverRoutes from './routes/driver.routes.js';
+
 const app = express();
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// API Routes
+app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/drivers', driverRoutes);
 
 // Health check route
 app.get('/health', (req, res) => {

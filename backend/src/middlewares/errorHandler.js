@@ -21,7 +21,7 @@ const errorHandler = (err, req, res, next) => {
 
   // Prisma Validation Error
   if (err.name === 'PrismaClientValidationError') {
-    const message = 'Invalid input data provided.';
+    const message = `Invalid input data provided: ${err.message}`;
     error = new ApiError(400, message);
   }
 
