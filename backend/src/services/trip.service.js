@@ -1,4 +1,5 @@
 import prisma from '../config/prisma.js';
+import ApiError from '../utils/ApiError.js';
 
 /**
  * Creates a trip in DRAFT status. No vehicles or drivers are locked.
@@ -7,19 +8,19 @@ export async function createDraftTrip(data) {
   const { source, destination, cargoWeight, distance, revenue, vehicleId, driverId } = data;
 
   if (!source || !destination || cargoWeight === undefined || distance === undefined || !vehicleId || !driverId) {
-    throw new Error('Missing required fields for draft trip creation.');
+    throw new ApiError(400,'Missing required fields for draft trip creation.');
   }
 
   // Verify vehicle exists
   const vehicle = await prisma.vehicle.findUnique({ where: { id: Number(vehicleId) } });
   if (!vehicle) {
-    throw new Error(`Vehicle with ID ${vehicleId} not found.`);
+    throw new ApiError(400,`Vehicle with ID ${vehicleId} not found.`);
   }
 
   // Verify driver exists
   const driver = await prisma.driver.findUnique({ where: { id: Number(driverId) } });
   if (!driver) {
-    throw new Error(`Driver with ID ${driverId} not found.`);
+    throw new ApiError(400,`Driver with ID ${driverId} not found.`);
   }
 
   return await prisma.trip.create({
@@ -52,38 +53,38 @@ export async function dispatchTrip(tripId) {
   });
 
   if (!trip) {
-    throw new Error(`Trip with ID ${tripId} not found.`);
+    throw new ApiError(400,`Trip with ID ${tripId} not found.`);
   }
 
   // 2. Validate current trip status
   if (trip.status !== 'DRAFT') {
-    throw new Error(`Trip must be in DRAFT status to dispatch. Current status: ${trip.status}`);
+    throw new ApiError(400,`Trip must be in DRAFT status to dispatch. Current status: ${trip.status}`);
   }
 
   const { vehicle, driver } = trip;
 
   if (!vehicle) {
-    throw new Error('No vehicle assigned to this trip.');
+    throw new ApiError(400,'No vehicle assigned to this trip.');
   }
   if (!driver) {
-    throw new Error('No driver assigned to this trip.');
+    throw new ApiError(400,'No driver assigned to this trip.');
   }
 
   // 3. Validate Vehicle availability
   if (vehicle.status !== 'AVAILABLE') {
-    throw new Error(`Assigned vehicle is not available. Current status: ${vehicle.status}`);
+    throw new ApiError(400,`Assigned vehicle is not available. Current status: ${vehicle.status}`);
   }
 
   // 4. Validate Driver availability
   if (driver.status !== 'AVAILABLE') {
-    throw new Error(`Assigned driver is not available. Current status: ${driver.status}`);
+    throw new ApiError(400,`Assigned driver is not available. Current status: ${driver.status}`);
   }
 
   // 5. Validate Driver license is not expired
   const now = new Date();
   const expiryDate = new Date(driver.licenseExpiry);
   if (expiryDate <= now) {
-    throw new Error(`Driver's license is expired. Expiry date: ${driver.licenseExpiry.toISOString().split('T')[0]}`);
+    throw new ApiError(400,`Driver's license is expired. Expiry date: ${driver.licenseExpiry.toISOString().split('T')[0]}`);
   }
 
   // 6. Execute atomic transaction
@@ -129,12 +130,12 @@ export async function completeTrip(tripId) {
   });
 
   if (!trip) {
-    throw new Error(`Trip with ID ${tripId} not found.`);
+    throw new ApiError(400,`Trip with ID ${tripId} not found.`);
   }
 
   // 2. Validate current trip status
   if (trip.status !== 'DISPATCHED') {
-    throw new Error(`Trip must be in DISPATCHED status to complete. Current status: ${trip.status}`);
+    throw new ApiError(400,`Trip must be in DISPATCHED status to complete. Current status: ${trip.status}`);
   }
 
   const { vehicle, driver } = trip;

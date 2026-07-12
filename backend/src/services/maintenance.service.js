@@ -1,4 +1,5 @@
 import prisma from '../config/prisma.js';
+import ApiError from '../utils/ApiError.js';
 
 /**
  * Creates an ACTIVE maintenance record and transitions vehicle status to IN_SHOP.
@@ -7,7 +8,7 @@ export async function sendVehicleToShop(data) {
   const { vehicleId, description, cost, date } = data;
 
   if (!vehicleId || !description || cost === undefined) {
-    throw new Error('Missing required fields for maintenance record.');
+    throw new ApiError(400,'Missing required fields for maintenance record.');
   }
 
   // 1. Fetch vehicle status
@@ -16,12 +17,12 @@ export async function sendVehicleToShop(data) {
   });
 
   if (!vehicle) {
-    throw new Error(`Vehicle with ID ${vehicleId} not found.`);
+    throw new ApiError(400,`Vehicle with ID ${vehicleId} not found.`);
   }
 
   // 2. Validate vehicle is not on trip
   if (vehicle.status === 'ON_TRIP') {
-    throw new Error(`Vehicle is currently ON_TRIP and cannot be sent to the shop.`);
+    throw new ApiError(400,`Vehicle is currently ON_TRIP and cannot be sent to the shop.`);
   }
 
   const recordDate = date ? new Date(date) : new Date();
@@ -62,12 +63,12 @@ export async function completeMaintenance(recordId) {
   });
 
   if (!record) {
-    throw new Error(`Maintenance record with ID ${recordId} not found.`);
+    throw new ApiError(400,`Maintenance record with ID ${recordId} not found.`);
   }
 
   // 2. Validate record is active
   if (record.status !== 'ACTIVE') {
-    throw new Error(`Maintenance record is already in ${record.status} status.`);
+    throw new ApiError(400,`Maintenance record is already in ${record.status} status.`);
   }
 
   // 3. Execute atomic transaction
